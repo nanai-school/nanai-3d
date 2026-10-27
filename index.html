@@ -72,6 +72,18 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 .compass svg{width:46px;height:46px;transition:none}
 .hint{font-size:11.5px;color:var(--muted);margin-top:6px}
 [hidden]{display:none!important}
+/* how-to-use panel */
+dialog#help{width:min(560px,calc(100vw - 32px));max-width:none;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:0;background:var(--paper);color:var(--ink);box-shadow:0 20px 50px rgba(10,20,20,.28);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+dialog#help::backdrop{background:rgba(10,15,15,.38)}
+.help-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.help-head h2{font:700 18px/1.2 var(--display);margin:0;letter-spacing:.04em}
+.help-body{padding:4px 18px 18px;max-height:min(72vh,600px);overflow:auto;font-size:13.5px;line-height:1.6}
+.help-body h3{font:700 13px/1.3 var(--body);margin:16px 0 6px;color:var(--accent);letter-spacing:.06em}
+.help-body dl{display:grid;grid-template-columns:max-content 1fr;gap:5px 16px;margin:0}
+.help-body dt{font-weight:500}
+.help-body dd{margin:0;color:var(--muted)}
+.help-body kbd{font:500 11.5px/1 var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;padding:2px 5px;background:var(--chip);color:var(--ink)}
+@media (max-width:640px){ .help-body dl{grid-template-columns:1fr;gap:0} .help-body dd{margin-bottom:8px} }
 #nogl{position:fixed;inset:0;display:grid;place-items:center;padding:24px;text-align:center;font-size:15px}
 @media (max-width:640px){
   .card{max-width:none;align-self:stretch;padding:12px 14px}
@@ -136,15 +148,49 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
           <button id="b-lbl" type="button" aria-pressed="true">標籤</button>
           <button id="b-tilt" type="button" aria-pressed="true">移軸景深</button>
           <button id="b-home" type="button">重設視角</button>
+          <button id="b-help" type="button" aria-haspopup="dialog">操作說明</button>
         </div>
       </div>
-      <div class="hint">拖曳旋轉 · 右鍵或雙指平移 · 滾輪或捏合縮放 · 雙擊重設</div>
+      <div class="hint">拖曳旋轉 · 右鍵或雙指平移 · 滾輪或捏合縮放 · 雙擊重設 · 詳見「操作說明」</div>
     </div>
     <div class="compass" title="指北">
       <svg viewBox="-24 -24 48 48" aria-hidden="true"><g id="needle"><path d="M0-19 L5 2 L0-2 L-5 2Z" style="fill:var(--accent)"/><path d="M0 19 L5 2 L0-2 L-5 2Z" style="fill:var(--muted)" opacity=".55"/></g><text x="0" y="3.5" text-anchor="middle" font-size="9" font-weight="700" style="fill:var(--ink);font-family:var(--body)">北</text></svg>
     </div>
   </div>
 </div>
+
+<dialog id="help" aria-labelledby="help-title">
+  <div class="help-head">
+    <h2 id="help-title">操作說明</h2>
+    <button id="help-close" type="button" aria-label="關閉操作說明">關閉</button>
+  </div>
+  <div class="help-body">
+    <h3>電腦（滑鼠、觸控板）</h3>
+    <dl>
+      <dt>旋轉視角</dt><dd>按住滑鼠左鍵拖曳</dd>
+      <dt>平移</dt><dd>按住右鍵或滾輪鍵拖曳，或按住 <kbd>Shift</kbd> 再用左鍵拖曳</dd>
+      <dt>放大縮小</dt><dd>滾動滑鼠滾輪；觸控板用雙指上下滑動</dd>
+      <dt>回到初始視角</dt><dd>在模型上點兩下，或按「重設視角」</dd>
+    </dl>
+    <h3>手機、平板（觸控）</h3>
+    <dl>
+      <dt>旋轉視角</dt><dd>單指拖曳</dd>
+      <dt>平移</dt><dd>雙指一起往同一方向拖曳</dd>
+      <dt>放大縮小</dt><dd>雙指捏合縮小、張開放大</dd>
+      <dt>回到初始視角</dt><dd>在模型上快速點兩下，或按「重設視角」</dd>
+      <dt>畫面卡頓時</dt><dd>關閉「移軸景深」會比較順</dd>
+    </dl>
+    <h3>時間與播放</h3>
+    <dl>
+      <dt>時間軸</dt><dd>拖曳下方滑桿，看一天中不同時刻的日照、陰影和師生活動</dd>
+      <dt>星期</dt><dd>選擇星期一到五；星期二、四早上有健康操</dd>
+      <dt>播放一天</dt><dd>讓時間自動前進；「速度」可選實際時間或每秒 1、5、15 分鐘</dd>
+      <dt>標籤</dt><dd>顯示或隱藏建築與地點名稱</dd>
+      <dt>移軸景深</dt><dd>上下邊緣模糊、像拍微縮模型的效果，可開可關</dd>
+      <dt>指北針</dt><dd>右下角的紅色指針永遠指向北方</dd>
+    </dl>
+  </div>
+</dialog>
 
 <script>
 const OSM_WAYS=[
@@ -810,24 +856,42 @@ for (const w of WAYS.filter(w => w.k.startsWith('pitch'))) {
   }
 }
 goal(TRACK.cu, -23.0, -1); goal(TRACK.cu, 17.0, 1);
-// playground and shade sails on the south lawn
+// playground and shade sails on the south lawn (photo from the south bend): a round artificial-turf pad with a grey
+// kerb; a play tower on dark brown posts under a dark purple pitched roof, yellow side panels, a yellow slide and a
+// black rope-net ladder; a red spring rider; khaki shade sails on grey poles with blue padding; a green notice board
 (() => {
-  const pu = 15.1, pv = -30.7;
-  disc(pu, pv, 4.4, 0.067, lin('#8fbf62'), 5, 32);
+  const pu = 15.1, pv = -30.7, brown = lin('#4a3328'), roofP = lin('#4b2d3a'), yellow = C2.yellowP;
+  disc(pu, pv, 4.4, 0.067, lin('#7fb35a'), 5, 32);
   { const R = []; for (let i = 0; i < 32; i++) { const a = i / 32 * Math.PI * 2; R.push([pu + 4.4 * Math.cos(a), pv + 4.4 * Math.sin(a)]); } strip(R, 0.25, 0.07, lin('#bfbab0'), 0, true); }
-  for (const [du, dv] of [[-0.8, -0.8], [0.8, -0.8], [0.8, 0.8], [-0.8, 0.8]]) box(pu + du, pv + dv, 0.12, 0.12, 0, 2.6, lin('#6a4a2f'));
-  box(pu, pv, 1.8, 1.8, 1.15, 1.3, C2.yellowP);
-  const top = W(pu, pv, 3.6), cs = [[-1.1, -1.1], [1.1, -1.1], [1.1, 1.1], [-1.1, 1.1]].map(([a, b]) => W(pu + a, pv + b, 2.6));
-  for (let i = 0; i < 4; i++) tri(cs[i], cs[(i + 1) % 4], top, C2.purple);
-  quad(W(pu + 0.9, pv - 0.5, 1.25), W(pu + 0.9, pv + 0.5, 1.25), W(pu + 3.4, pv + 0.5, 0.1), W(pu + 3.4, pv - 0.5, 0.1), C2.yellowP);
-  for (const [du, dv] of [[-0.9, 0.9], [0.9, 0.9]]) box(pu + du, pv + dv + 0.1, 0.06, 0.06, 1.3, 2.1, C2.yellowP);
+  for (const [du, dv] of [[-0.8, -0.8], [0.8, -0.8], [0.8, 0.8], [-0.8, 0.8]]) box(pu + du, pv + dv, 0.13, 0.13, 0, 2.6, brown);
+  box(pu, pv, 1.7, 1.7, 1.12, 1.25, lin('#3a2c24'));                                   // deck
+  // pitched roof, ridge along u, with gable ends
+  const yE = 2.55, yR = 3.45, ov = 0.25, R0 = [pu - 0.8 - ov, pu + 0.8 + ov];
+  for (const s of [-1, 1]) quad(W(R0[0], pv + s * (0.8 + ov), yE), W(R0[1], pv + s * (0.8 + ov), yE), W(R0[1], pv, yR), W(R0[0], pv, yR), roofP, 10, 0);
+  for (const u of [pu - 0.8, pu + 0.8]) tri(W(u, pv - 0.8, yE + 0.1), W(u, pv + 0.8, yE + 0.1), W(u, pv, yR - 0.08), lin('#5b3a46'));
+  // yellow panels on both long sides, a low yellow rail at the slide end
+  for (const s of [-1, 1]) quad(W(pu - 0.75, pv + s * 0.82, 1.25), W(pu + 0.75, pv + s * 0.82, 1.25), W(pu + 0.75, pv + s * 0.82, 2.15), W(pu - 0.75, pv + s * 0.82, 2.15), yellow, 0, 0, [0, 0, -s]);
+  // slide down to the west, with side rails
+  quad(W(pu - 0.85, pv - 0.3, 1.2), W(pu - 0.85, pv + 0.3, 1.2), W(pu - 3.2, pv + 0.3, 0.12), W(pu - 3.2, pv - 0.3, 0.12), yellow);
+  for (const s of [-1, 1]) segBox([pu - 0.85, pv + s * 0.32], [pu - 3.2, pv + s * 0.32], 0.05, 0.1, 0.35, yellow);
+  for (const s of [-1, 1]) quad(W(pu - 0.85, pv + s * 0.33, 1.2), W(pu - 3.2, pv + s * 0.33, 0.12), W(pu - 3.2, pv + s * 0.33, 0.35), W(pu - 0.85, pv + s * 0.33, 1.45), yellow);
+  // rope-net ladder hanging from the south side of the deck between two dark posts
+  box(pu - 0.6, pv - 1.6, 0.1, 0.1, 0, 1.9, brown); box(pu + 0.6, pv - 1.6, 0.1, 0.1, 0, 1.3, brown);
+  railQuad([pu - 0.6, pv - 1.6], [pu + 0.6, pv - 1.6], 0.05, 1.25, 7400, lin('#1d1d1d'));
+  segBox([pu - 0.6, pv - 1.6], [pu + 0.6, pv - 1.6], 0.05, 1.22, 1.28, yellow);
+  // red spring rider
+  cyl(pu + 1.9, pv - 1.6, 0.08, 0.07, 0.42, lin('#9aa0a4'), 8, 3);
+  cyl(pu + 1.9, pv - 1.6, 0.3, 0.42, 0.56, lin('#d22c2c'), 14); cyl(pu + 1.9, pv - 1.6, 0.18, 0.56, 0.62, lin('#e85050'), 12);
+  // green notice board beside the pad
+  box(pu + 4.3, pv + 2.4, 0.08, 0.08, 0, 1.9, lin('#26302c'));
+  box(pu + 4.3, pv + 2.4, 0.06, 0.6, 0.9, 1.9, lin('#2f6e5c'));
   // two triangular sails fanning out from one tall pole at the south end (aerial photo)
   const Pp = [16.7, -35.4, 4.9], sails = [[[8.4, -33.9, 4.1], [12.8, -26.0, 3.0], Pp], [Pp, [13.4, -26.9, 3.1], [21.3, -28.5, 4.1]]];
-  for (const [u, v, h] of [sails[0][0], sails[0][1], Pp, sails[1][1], sails[1][2]]) { box(u, v, 0.3, 0.3, 0, 1.8, C2.blueLine); cyl(u, v, 0.1, 1.8, h + 0.3, C.metal, 8, 3); }
+  for (const [u, v, h] of [sails[0][0], sails[0][1], Pp, sails[1][1], sails[1][2]]) { cyl(u, v, 0.14, 0, 1.6, C2.blueLine, 10); cyl(u, v, 0.1, 1.6, h + 0.3, lin('#b8bcbf'), 10, 3); }
   for (const s of sails) {
     const m = [(s[0][0] + s[1][0] + s[2][0]) / 3, (s[0][1] + s[1][1] + s[2][1]) / 3, (s[0][2] + s[1][2] + s[2][2]) / 3 - 0.35];
     const pts = s.map(p => W(p[0], p[1], p[2])), M = W(m[0], m[1], m[2]);
-    for (let i = 0; i < 3; i++) tri(pts[i], pts[(i + 1) % 3], M, C2.sail);    // slight sag towards the middle
+    for (let i = 0; i < 3; i++) tri(pts[i], pts[(i + 1) % 3], M, lin('#d5cba6'));    // khaki, sagging slightly toward the middle
   }
 })();
 LABELS.push({ t: '溜滑梯遊戲區', p: W(15.0, -31.0, 5.4) });   // under the two triangular shade sails inside the main gate
@@ -1969,7 +2033,17 @@ function goHome() { fitHome(); anim = { t0: performance.now(), from: { tgt: cam.
 /* ============================ INPUT ============================ */
 const ptrs = new Map();
 canvas.addEventListener('contextmenu', e => e.preventDefault());
-canvas.addEventListener('pointerdown', e => { try { canvas.setPointerCapture(e.pointerId); } catch (_) { } ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY, b: e.button }); anim = null; });
+let lastTap = { t: 0, x: 0, y: 0 };
+canvas.addEventListener('pointerdown', e => {
+  try { canvas.setPointerCapture(e.pointerId); } catch (_) { }
+  ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY, b: e.button }); anim = null;
+  // touch screens do not reliably send dblclick: a quick second tap in the same spot resets the view
+  if (e.pointerType === 'touch' && ptrs.size === 1) {
+    const now = performance.now();
+    if (now - lastTap.t < 320 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 30) { goHome(); lastTap.t = 0; }
+    else lastTap = { t: now, x: e.clientX, y: e.clientY };
+  }
+});
 canvas.addEventListener('pointermove', e => {
   const p = ptrs.get(e.pointerId); if (!p) return;
   if (ptrs.size === 1) {
@@ -2520,6 +2594,11 @@ $('b-play').addEventListener('click', e => { playing = !playing; toggle(e.curren
 $('b-lbl').addEventListener('click', e => { showLabels = !showLabels; toggle(e.currentTarget, showLabels); labelLayer.hidden = !showLabels; });
 $('b-tilt').addEventListener('click', e => { tilt = !tilt; toggle(e.currentTarget, tilt); });
 $('b-home').addEventListener('click', goHome);
+// 操作說明: a modal panel, closed by its button, Esc or a tap outside it
+const helpDlg = $('help');
+$('b-help').addEventListener('click', () => { if (helpDlg.showModal) helpDlg.showModal(); else helpDlg.setAttribute('open', ''); });
+$('help-close').addEventListener('click', () => helpDlg.close ? helpDlg.close() : helpDlg.removeAttribute('open'));
+helpDlg.addEventListener('click', e => { if (e.target === helpDlg && helpDlg.close) helpDlg.close(); });
 setHour(hour);
 
 let bArea = 0; for (const B of BLD) bArea += Math.abs(area2(B.P));
