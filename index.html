@@ -85,6 +85,25 @@ dialog#help::backdrop{background:rgba(10,15,15,.38)}
 .help-body dd{margin:0;color:var(--muted)}
 .help-body kbd{font:500 11.5px/1 var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;padding:2px 5px;background:var(--chip);color:var(--ink)}
 @media (max-width:640px){ .help-body dl{grid-template-columns:1fr;gap:0} .help-body dd{margin-bottom:8px} }
+/* embed mode (?embed=1, for an iframe on the school homepage): a small title instead of the card, a slimmer rail,
+   a full-screen button; on touch screens a tap-to-start layer so swiping still scrolls the host page */
+.embed-title,#b-full{display:none}
+#touch-gate{position:fixed;inset:0;z-index:5;display:grid;place-items:center;align-content:center;gap:8px;background:rgba(10,18,18,.22);touch-action:pan-x pan-y;text-align:center;padding:16px;cursor:pointer}
+#touch-gate b{font:700 15px/1.2 var(--body);background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:12px 20px;box-shadow:0 8px 24px rgba(10,20,20,.2)}
+#touch-gate small{font-size:12px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.embed .card,.embed #sunmeta,.embed .hint,.embed .sel,.embed #b-tilt{display:none}
+.embed .embed-title{display:block;align-self:flex-start;font:700 14px/1.2 var(--display);letter-spacing:.04em;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:6px 10px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.embed .embed-title small{font:400 10.5px/1 var(--body);color:var(--muted);margin-left:6px;letter-spacing:0}
+.embed #b-full{display:inline-block}
+.embed .ui{padding:10px max(10px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));gap:8px}
+.embed .rail{padding:7px 9px;gap:8px}
+.embed .clock{min-width:0}
+.embed .clock output{font-size:16px}
+.embed input[type=range]{width:min(220px,34vw)}
+.embed button{padding:7px 9px}
+.embed .compass{width:42px;height:42px}
+.embed .compass svg{width:32px;height:32px}
+@media (max-width:640px){ .embed input[type=range]{width:100%} .embed .clock .act{display:none} }
 #nogl{position:fixed;inset:0;display:grid;place-items:center;padding:24px;text-align:center;font-size:15px}
 @media (max-width:640px){
   .card{max-width:none;align-self:stretch;padding:12px 14px}
@@ -108,6 +127,7 @@ dialog#help::backdrop{background:rgba(10,15,15,.38)}
 <div id="nogl" hidden>這個瀏覽器不支援 WebGL2，無法顯示 3D 模型。請改用新版 Chrome、Edge、Safari 或 Firefox。</div>
 
 <div class="ui">
+  <div class="embed-title">南隘國小<small>3D 校園模型</small></div>
   <section class="card" aria-label="學校資訊">
     <div class="eyebrow">新竹市香山區 · 校園微縮模型</div>
     <h1>南隘國小</h1>
@@ -151,6 +171,7 @@ dialog#help::backdrop{background:rgba(10,15,15,.38)}
           <button id="b-tilt" type="button" aria-pressed="true">移軸景深</button>
           <button id="b-home" type="button">重設視角</button>
           <button id="b-help" type="button" aria-haspopup="dialog">操作說明</button>
+          <button id="b-full" type="button">全螢幕</button>
         </div>
       </div>
       <div class="hint">拖曳旋轉 · 右鍵或雙指平移 · 滾輪或捏合縮放 · 雙擊重設 · 詳見「操作說明」</div>
@@ -160,6 +181,8 @@ dialog#help::backdrop{background:rgba(10,15,15,.38)}
     </div>
   </div>
 </div>
+
+<div id="touch-gate" hidden role="button" tabindex="0" aria-label="點一下開始操作 3D 模型"><b>點一下開始操作</b><small>單指旋轉 · 雙指移動與縮放</small></div>
 
 <dialog id="help" aria-labelledby="help-title">
   <div class="help-head">
@@ -2610,6 +2633,24 @@ const helpDlg = $('help');
 $('b-help').addEventListener('click', () => { if (helpDlg.showModal) helpDlg.showModal(); else helpDlg.setAttribute('open', ''); });
 $('help-close').addEventListener('click', () => helpDlg.close ? helpDlg.close() : helpDlg.removeAttribute('open'));
 helpDlg.addEventListener('click', e => { if (e.target === helpDlg && helpDlg.close) helpDlg.close(); });
+// embed mode (?embed=1) for an iframe on the school homepage
+if (new URLSearchParams(location.search).has('embed')) {
+  document.documentElement.classList.add('embed');
+  const fullPage = location.origin + location.pathname, root = document.documentElement, bFull = $('b-full');
+  const openPage = () => window.open(fullPage, '_blank', 'noopener');
+  bFull.addEventListener('click', () => {
+    if (document.fullscreenElement) { document.exitFullscreen(); return; }
+    if (root.requestFullscreen) root.requestFullscreen().catch(openPage); else openPage();   // e.g. iPhone: open the full page instead
+  });
+  document.addEventListener('fullscreenchange', () => { bFull.textContent = document.fullscreenElement ? '離開全螢幕' : '全螢幕'; });
+  // on touch screens the model only takes over the finger after a tap, so swiping over the frame scrolls the page
+  if (matchMedia('(pointer: coarse)').matches) {
+    const gate = $('touch-gate'), open = () => { gate.hidden = true; };
+    gate.hidden = false;
+    gate.addEventListener('click', open);
+    gate.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+  }
+}
 setHour(hour);
 
 let bArea = 0; for (const B of BLD) bArea += Math.abs(area2(B.P));
