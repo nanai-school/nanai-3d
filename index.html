@@ -485,9 +485,9 @@ const nearBuilding = (pt, m) => BLD.some(b => pip(pt, b.P) || distToLine(pt, b.P
 // concrete ground: stalls and aisle, the yard up to the mat, round the kitchen and its back yard to 稻香樓, and out
 // through the 側門 to meet the 通學步道
 // slightly raised rubber-mat platform in front of the aisle, south of the 資源回收室, the banyans growing out of it;
-// 9.6 x 6.2 m with square corners, its edges parallel to the track straight
+// 9.6 x 8.0 m with square corners, its edges parallel to the track straight, reaching well back toward the parking lot
 const MAT_C = PK(18.0, 17.9);
-const MAT = [[MAT_C[0] + 3.1, MAT_C[1] - 4.8], [MAT_C[0] + 3.1, MAT_C[1] + 4.8], [MAT_C[0] - 3.1, MAT_C[1] + 4.8], [MAT_C[0] - 3.1, MAT_C[1] - 4.8]];
+const MAT = [[MAT_C[0] + 3.1, MAT_C[1] - 4.8], [MAT_C[0] + 3.1, MAT_C[1] + 4.8], [MAT_C[0] - 4.9, MAT_C[1] + 4.8], [MAT_C[0] - 4.9, MAT_C[1] - 4.8]];
 const PARKING = [PK(0.4, 0.3), PK(43.2, 0.3), PK(43.2, 12.5), PK(26.9, 12.5), PK(22.8, 13.0), MAT[2], MAT[3], PK(-1.0, 14.9), PK(-4.6, 14.9), PK(-4.6, 9.6), PK(-1.8, 9.6)];
 // 29巷 接送區 after the renovation, laid out from the design drawing. DL(x, y): x along 南隘路 (toward the gate),
 // y away from the road toward 29巷, metres from the left curb at the road edge
